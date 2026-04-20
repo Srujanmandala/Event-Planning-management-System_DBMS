@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Event Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="landing">
+        <div class="landing-card">
+            <div class="logo-mark center">EMS</div>
+            <h1>Login</h1>
+            <p>Enter username and password to continue.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login') }}" class="form-grid">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <div class="form-actions">
+                    <button class="btn primary" type="submit">Login</button>
+                </div>
+            </form>
+            <p style="margin-top: 12px; font-size: 13px;">
+                Demo users: admin/admin123, user/user123
+            </p>
+        </div>
+    </div>
+</body>
+</html>

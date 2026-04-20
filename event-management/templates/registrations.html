@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Registration Module</h2>
+
+<div class="panel">
+    <h3>{{ "Update Registration" if registration_to_edit else "Add Registration" }}</h3>
+    <form method="POST" action="{{ url_for('registrations') }}" class="form-grid">
+        {% if registration_to_edit %}
+            <input type="hidden" name="registration_id" value="{{ registration_to_edit.registration_id }}">
+        {% endif %}
+        <select name="participant_id" required>
+            <option value="">Select Participant</option>
+            {% for participant in participants %}
+                <option value="{{ participant.participant_id }}" {% if registration_to_edit and registration_to_edit.participant_id == participant.participant_id %}selected{% endif %}>
+                    {{ participant.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <select name="event_id" required>
+            <option value="">Select Event</option>
+            {% for event in events %}
+                <option value="{{ event.event_id }}" {% if registration_to_edit and registration_to_edit.event_id == event.event_id %}selected{% endif %}>
+                    {{ event.event_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="date" name="registration_date" required value="{{ registration_to_edit.registration_date if registration_to_edit else '' }}">
+        <input type="number" name="registration_fee" step="0.01" min="0" placeholder="Registration Fee" required value="{{ registration_to_edit.registration_fee if registration_to_edit else '' }}">
+        <select name="payment_status" required>
+            {% set selected_status = registration_to_edit.payment_status if registration_to_edit else '' %}
+            <option value="Pending" {% if selected_status == "Pending" %}selected{% endif %}>Pending</option>
+            <option value="Paid" {% if selected_status == "Paid" %}selected{% endif %}>Paid</option>
+            <option value="Failed" {% if selected_status == "Failed" %}selected{% endif %}>Failed</option>
+        </select>
+        <div class="form-actions">
+            <button class="btn primary" type="submit">{{ "Update Registration" if registration_to_edit else "Add Registration" }}</button>
+            {% if registration_to_edit %}
+                <a class="btn secondary" href="{{ url_for('registrations') }}">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>All Registrations</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Participant</th>
+                    <th>Event</th>
+                    <th>Registration Date</th>
+                    <th>Registration Fee</th>
+                    <th>Payment Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in registrations %}
+                <tr>
+                    <td>{{ registration.registration_id }}</td>
+                    <td>{{ registration.participant_name }}</td>
+                    <td>{{ registration.event_name }}</td>
+                    <td>{{ registration.registration_date }}</td>
+                    <td>{{ registration.registration_fee }}</td>
+                    <td><span class="badge {{ registration.payment_status|lower }}">{{ registration.payment_status }}</span></td>
+                    <td class="actions">
+                        <a class="btn small" href="{{ url_for('registrations', edit_id=registration.registration_id) }}">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_registration', registration_id=registration.registration_id) }}" onsubmit="return confirmDelete()">
+                            <button class="btn danger small" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No registrations found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

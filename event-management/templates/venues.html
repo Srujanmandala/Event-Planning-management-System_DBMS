@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Venue Management</h2>
+
+<div class="panel">
+    <h3>{{ "Update Venue" if venue_to_edit else "Add Venue" }}</h3>
+    <form method="POST" action="{{ url_for('venues') }}" class="form-grid">
+        {% if venue_to_edit %}
+            <input type="hidden" name="venue_id" value="{{ venue_to_edit.venue_id }}">
+        {% endif %}
+        <input type="text" name="venue_name" placeholder="Venue Name" required value="{{ venue_to_edit.venue_name if venue_to_edit else '' }}">
+        <input type="text" name="location" placeholder="Location" required value="{{ venue_to_edit.location if venue_to_edit else '' }}">
+        <input type="number" name="capacity" min="1" placeholder="Capacity" required value="{{ venue_to_edit.capacity if venue_to_edit else '' }}">
+        <div class="form-actions">
+            <button class="btn primary" type="submit">{{ "Update Venue" if venue_to_edit else "Add Venue" }}</button>
+            {% if venue_to_edit %}
+                <a class="btn secondary" href="{{ url_for('venues') }}">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>All Venues</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Venue Name</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venue in venues %}
+                <tr>
+                    <td>{{ venue.venue_id }}</td>
+                    <td>{{ venue.venue_name }}</td>
+                    <td>{{ venue.location }}</td>
+                    <td>{{ venue.capacity }}</td>
+                    <td class="actions">
+                        <a class="btn small" href="{{ url_for('venues', edit_id=venue.venue_id) }}">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_venue', venue_id=venue.venue_id) }}" onsubmit="return confirmDelete()">
+                            <button class="btn danger small" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No venues found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

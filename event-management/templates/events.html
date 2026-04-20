@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Event Management</h2>
+
+<div class="panel">
+    <h3>{{ "Update Event" if event_to_edit else "Add New Event" }}</h3>
+    <form method="POST" action="{{ url_for('edit_event', event_id=event_to_edit.event_id) if event_to_edit else url_for('add_event') }}" class="form-grid">
+        <input type="text" name="event_name" placeholder="Event Name" required value="{{ event_to_edit.event_name if event_to_edit else '' }}">
+        <input type="date" name="event_date" required value="{{ event_to_edit.event_date if event_to_edit else '' }}">
+        <input type="text" name="event_type" placeholder="Event Type" required value="{{ event_to_edit.event_type if event_to_edit else '' }}">
+
+        <select name="venue_id" required>
+            <option value="">Select Venue</option>
+            {% for venue in venues %}
+                <option value="{{ venue.venue_id }}" {% if event_to_edit and event_to_edit.venue_id == venue.venue_id %}selected{% endif %}>
+                    {{ venue.venue_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="organizer_id" required>
+            <option value="">Select Organizer</option>
+            {% for organizer in organizers %}
+                <option value="{{ organizer.organizer_id }}" {% if event_to_edit and event_to_edit.organizer_id == organizer.organizer_id %}selected{% endif %}>
+                    {{ organizer.organizer_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <div class="form-actions">
+            <button class="btn primary" type="submit">{{ "Update Event" if event_to_edit else "Add Event" }}</button>
+            {% if event_to_edit %}
+                <a class="btn secondary" href="{{ url_for('events') }}">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>All Events</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Venue</th>
+                    <th>Organizer</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.event_id }}</td>
+                    <td>{{ event.event_name }}</td>
+                    <td>{{ event.event_date }}</td>
+                    <td>{{ event.event_type }}</td>
+                    <td>{{ event.venue_name }}</td>
+                    <td>{{ event.organizer_name }}</td>
+                    <td class="actions">
+                        <a class="btn small secondary" href="{{ url_for('download_event_registrations_pdf', event_id=event.event_id) }}">Download PDF</a>
+                        <a class="btn small" href="{{ url_for('edit_event', event_id=event.event_id) }}">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_event', event_id=event.event_id) }}" onsubmit="return confirmDelete()">
+                            <button class="btn danger small" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No events found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

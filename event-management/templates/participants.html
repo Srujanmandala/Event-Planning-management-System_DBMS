@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Participant Registration</h2>
+
+<div class="panel">
+    <h3>{{ "Update Participant" if participant_to_edit else "Add Participant" }}</h3>
+    <form method="POST" action="{{ url_for('participants') }}" class="form-grid">
+        {% if participant_to_edit %}
+            <input type="hidden" name="participant_id" value="{{ participant_to_edit.participant_id }}">
+        {% endif %}
+        <input type="text" name="name" placeholder="Participant Name" required value="{{ participant_to_edit.name if participant_to_edit else '' }}">
+        <input type="email" name="email" placeholder="Email" required value="{{ participant_to_edit.email if participant_to_edit else '' }}">
+        <input type="text" name="department" placeholder="Department" required value="{{ participant_to_edit.department if participant_to_edit else '' }}">
+        <input type="text" name="phone" placeholder="Phone Number" required value="{{ participant_to_edit.phone if participant_to_edit else '' }}">
+
+        <select name="event_id" required>
+            <option value="">Select Event</option>
+            {% for event in events %}
+                <option value="{{ event.event_id }}" {% if participant_to_edit and participant_to_edit.event_id == event.event_id %}selected{% endif %}>
+                    {{ event.event_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <div class="form-actions">
+            <button class="btn primary" type="submit">{{ "Update Participant" if participant_to_edit else "Add Participant" }}</button>
+            {% if participant_to_edit %}
+                <a class="btn secondary" href="{{ url_for('participants') }}">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>All Participants</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Phone</th>
+                    <th>Registered Event</th>
+                    <th>Participation Access</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participant in participants %}
+                <tr>
+                    <td>{{ participant.participant_id }}</td>
+                    <td>{{ participant.name }}</td>
+                    <td>{{ participant.email }}</td>
+                    <td>{{ participant.department }}</td>
+                    <td>{{ participant.phone }}</td>
+                    <td>{{ participant.event_name }}</td>
+                    <td>
+                        {% if participant.access_status == "Paid" %}
+                            <a class="btn small" href="{{ url_for('registrations', role='user', participant_id=participant.participant_id) }}">Access Participation</a>
+                        {% else %}
+                            <button class="btn secondary small" type="button" disabled title="Please complete payment to access participation">Access Locked</button>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        <a class="btn small" href="{{ url_for('participants', edit_id=participant.participant_id) }}">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_participant', participant_id=participant.participant_id) }}" onsubmit="return confirmDelete()">
+                            <button class="btn danger small" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8">No participants found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

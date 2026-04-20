@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Admin Dashboard</h2>
+
+<div class="cards-grid">
+    <div class="card">
+        <h3>Total Events</h3>
+        <p>{{ counts.events }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Participants</h3>
+        <p>{{ counts.participants }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Organizers</h3>
+        <p>{{ counts.organizers }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Venues</h3>
+        <p>{{ counts.venues }}</p>
+    </div>
+    <div class="card">
+        <h3>Total Payments</h3>
+        <p>{{ counts.payments }}</p>
+    </div>
+</div>
+{% endblock %}

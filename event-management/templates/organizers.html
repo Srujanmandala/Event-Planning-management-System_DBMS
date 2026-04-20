@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Organizer Management</h2>
+
+<div class="panel">
+    <h3>{{ "Update Organizer" if organizer_to_edit else "Add Organizer" }}</h3>
+    <form method="POST" action="{{ url_for('organizers') }}" class="form-grid">
+        {% if organizer_to_edit %}
+            <input type="hidden" name="organizer_id" value="{{ organizer_to_edit.organizer_id }}">
+        {% endif %}
+        <input type="text" name="organizer_name" placeholder="Organizer Name" required value="{{ organizer_to_edit.organizer_name if organizer_to_edit else '' }}">
+        <input type="text" name="phone" placeholder="Phone Number" required value="{{ organizer_to_edit.phone if organizer_to_edit else '' }}">
+        <div class="form-actions">
+            <button class="btn primary" type="submit">{{ "Update Organizer" if organizer_to_edit else "Add Organizer" }}</button>
+            {% if organizer_to_edit %}
+                <a class="btn secondary" href="{{ url_for('organizers') }}">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>All Organizers</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Organizer Name</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for organizer in organizers %}
+                <tr>
+                    <td>{{ organizer.organizer_id }}</td>
+                    <td>{{ organizer.organizer_name }}</td>
+                    <td>{{ organizer.phone }}</td>
+                    <td class="actions">
+                        <a class="btn small" href="{{ url_for('organizers', edit_id=organizer.organizer_id) }}">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_organizer', organizer_id=organizer.organizer_id) }}" onsubmit="return confirmDelete()">
+                            <button class="btn danger small" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">No organizers found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

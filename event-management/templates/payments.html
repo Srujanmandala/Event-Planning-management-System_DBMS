@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Budget / Payment Management</h2>
+
+<div class="panel">
+    <h3>{{ "Update Payment" if payment_to_edit else "Add Payment" }}</h3>
+    <form method="POST" action="{{ url_for('payments') }}" class="form-grid">
+        {% if payment_to_edit %}
+            <input type="hidden" name="payment_id" value="{{ payment_to_edit.payment_id }}">
+        {% endif %}
+        <select name="participant_id" required>
+            <option value="">Select Participant</option>
+            {% for participant in participants %}
+                <option value="{{ participant.participant_id }}" {% if payment_to_edit and payment_to_edit.participant_id == participant.participant_id %}selected{% endif %}>
+                    {{ participant.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="number" name="amount" step="0.01" min="0" placeholder="Amount" required value="{{ payment_to_edit.amount if payment_to_edit else '' }}">
+        <input type="date" name="payment_date" required value="{{ payment_to_edit.payment_date if payment_to_edit else '' }}">
+        <select name="payment_status" required>
+            {% set selected_status = payment_to_edit.payment_status if payment_to_edit else '' %}
+            <option value="Pending" {% if selected_status == "Pending" %}selected{% endif %}>Pending</option>
+            <option value="Paid" {% if selected_status == "Paid" %}selected{% endif %}>Paid</option>
+            <option value="Failed" {% if selected_status == "Failed" %}selected{% endif %}>Failed</option>
+        </select>
+        <div class="form-actions">
+            <button class="btn primary" type="submit">{{ "Update Payment" if payment_to_edit else "Add Payment" }}</button>
+            {% if payment_to_edit %}
+                <a class="btn secondary" href="{{ url_for('payments') }}">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="panel">
+    <h3>All Payments</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Participant</th>
+                    <th>Event</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.payment_id }}</td>
+                    <td>{{ payment.participant_name }}</td>
+                    <td>{{ payment.event_name }}</td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ payment.payment_date }}</td>
+                    <td><span class="badge {{ payment.payment_status|lower }}">{{ payment.payment_status }}</span></td>
+                    <td class="actions">
+                        <a class="btn small" href="{{ url_for('payments', edit_id=payment.payment_id) }}">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_payment', payment_id=payment.payment_id) }}" onsubmit="return confirmDelete()">
+                            <button class="btn danger small" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No payments found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
